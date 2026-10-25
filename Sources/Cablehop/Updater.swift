@@ -167,11 +167,14 @@ final class Updater {
     }
 
     func skip(_ release: Release) {
+        Log.info("Update \(release.tagName) skipped", .update)
         if let v = release.version { defaults.set(v.description, forKey: Self.skippedKey) }
+        phase = .idle
         dismiss()
     }
 
     func dismiss() {
+        if case .available(let release) = phase { Log.info("Update \(release.tagName) postponed", .update) }
         isPresented = false
         if case .downloading = phase { return }
         if case .installing = phase { return }
@@ -179,7 +182,9 @@ final class Updater {
     }
 
     func install(_ release: Release) {
+        Log.info("Install Update chosen for \(release.tagName)", .update)
         if let transfers = TransferManager.current, transfers.activeCount > 0 {
+            Log.warning("Update postponed: transfers in progress", .update)
             phase = .failed("Finish or cancel the transfers in progress, then install the update.")
             return
         }
@@ -188,10 +193,12 @@ final class Updater {
 
     private func performInstall(_ release: Release) async {
         guard let dmgAsset = release.diskImage, let sumsAsset = release.checksums, let expected = release.version else {
+            Log.error("Release \(release.tagName) is missing its installer or checksum file", .update)
             phase = .failed("This release is missing its installer or checksum file.")
             return
         }
         guard let signatureAsset = release.signature else {
+            Log.error("Release \(release.tagName) isn't signed; not installing", .update)
             phase = .failed("This release isn't signed, so Cablehop won't install it automatically. You can download it from GitHub instead.")
             return
         }

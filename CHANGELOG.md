@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.2
+
+### Changed
+- **Bigger logo and name** in the window's title area, so Cablehop is easy to recognise at a glance.
+- **Clearer update log.** The log now records every choice in the update window (Install, Remind Me
+  Later, Skip) and every reason an update can't start, so update problems are easy to diagnose.
+
 ## 2.1
 
 ### Changed

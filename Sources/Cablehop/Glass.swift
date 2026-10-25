@@ -75,13 +75,13 @@ private struct HideWindowTitle: ViewModifier {
 /// Logo with the app name beside it, for the window's title area.
 struct TitleLockup: View {
     var body: some View {
-        HStack(spacing: 8) {
-            AppLogo(size: 24)
+        HStack(spacing: 10) {
+            AppLogo(size: 36)
             Text("Cablehop")
-                .font(.title3.weight(.semibold))
+                .font(.system(size: 22, weight: .bold))
                 .fixedSize()
         }
-        .padding(.leading, 4)
+        .padding(.leading, 6)
         .accessibilityElement(children: .combine)
         .help("Cablehop \(AppInfo.version)")
     }
