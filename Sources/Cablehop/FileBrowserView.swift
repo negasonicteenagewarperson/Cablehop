@@ -660,7 +660,7 @@ struct FileTransferModeBanner: View {
         .foregroundStyle(.secondary)
         .padding(.horizontal, 14)
         .padding(.vertical, 8)
-        .glassCard(cornerRadius: 14)
+        .contentCard(cornerRadius: 14)
     }
 }
 

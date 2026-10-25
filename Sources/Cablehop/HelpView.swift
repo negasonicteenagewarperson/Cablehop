@@ -78,6 +78,6 @@ struct ReportProblemView: View {
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .glassCard(cornerRadius: 14)
+        .contentCard(cornerRadius: 14)
     }
 }

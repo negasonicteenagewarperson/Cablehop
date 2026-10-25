@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.1
+
+### Changed
+- **Logo and name together.** The window's title area now shows the Cablehop logo with the name beside it.
+- **Cleaner Liquid Glass.** The logo no longer sits inside a round glass button: macOS 26 gives every
+  toolbar item one by default, which isn't how app titles look. Glass is now used only where Apple uses it,
+  on controls floating above content (toolbar, sidebar, path bar, photo-size slider). Content panels (the
+  welcome cards, notices, release notes, Report a Problem steps) use the standard grouped style, and there's
+  no more glass layered on glass in the sidebar.
+
 ## 2.0
 
 ### New

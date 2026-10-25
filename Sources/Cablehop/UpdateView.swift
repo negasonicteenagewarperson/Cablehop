@@ -91,7 +91,7 @@ private struct ReleaseNotes: View {
             .padding(12)
         }
         .frame(height: 220)
-        .glassCard(cornerRadius: 12)
+        .contentCard(cornerRadius: 12)
     }
 
     private var lines: [(text: String, isHeading: Bool)] {

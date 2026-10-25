@@ -58,7 +58,7 @@ private struct StepCard: View {
         }
         .padding(18)
         .frame(width: 280, alignment: .leading)
-        .glassCard(cornerRadius: 22)
+        .contentCard(cornerRadius: 20)
     }
 }
 

@@ -2,20 +2,21 @@ import AppKit
 import SwiftUI
 
 // Liquid Glass on macOS 26 and later, with the closest older material on macOS 14 and 15.
+//
+// Following Apple's guidance, glass is only for controls that float above content (the path bar, the
+// photo-size slider). Content panels use the standard grouped fill instead, and nothing glass sits on
+// top of something that's already glass (the sidebar, sheets).
 
 extension View {
-    /// A floating glass panel, for controls that sit above content.
-    @ViewBuilder
-    func glassCard(cornerRadius: CGFloat = 18) -> some View {
+    /// A panel in the content layer: Apple's standard subtle grouped fill with a hairline edge.
+    func contentCard(cornerRadius: CGFloat = 16) -> some View {
         let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-        if #available(macOS 26, *) {
-            self.glassEffect(.regular, in: shape)
-        } else {
-            self.background(.regularMaterial, in: shape)
-        }
+        return self
+            .background(.quinary, in: shape)
+            .overlay(shape.strokeBorder(.quaternary, lineWidth: 0.5))
     }
 
-    /// A glass capsule (path bar, small floating controls).
+    /// A glass capsule for small controls floating above content (path bar, size slider).
     @ViewBuilder
     func glassCapsule() -> some View {
         if #available(macOS 26, *) {
@@ -45,14 +46,16 @@ extension View {
         }
     }
 
-    /// Puts the Cablehop logo in the window's title area in place of the name.
+    /// Shows the Cablehop logo and name in the window's title area, like a title rather than a button.
     func logoInTitleBar() -> some View {
         self
             .toolbar {
-                ToolbarItem(placement: .navigation) {
-                    AppLogo(size: 26)
-                        .padding(.horizontal, 2)
-                        .help("Cablehop \(AppInfo.version)")
+                if #available(macOS 26.0, *) {
+                    // Without this, macOS 26 puts every toolbar item in a round glass button.
+                    ToolbarItem(placement: .navigation) { TitleLockup() }
+                        .sharedBackgroundVisibility(.hidden)
+                } else {
+                    ToolbarItem(placement: .navigation) { TitleLockup() }
                 }
             }
             .modifier(HideWindowTitle())
@@ -66,6 +69,21 @@ private struct HideWindowTitle: ViewModifier {
         } else {
             content
         }
+    }
+}
+
+/// Logo with the app name beside it, for the window's title area.
+struct TitleLockup: View {
+    var body: some View {
+        HStack(spacing: 8) {
+            AppLogo(size: 24)
+            Text("Cablehop")
+                .font(.title3.weight(.semibold))
+                .fixedSize()
+        }
+        .padding(.leading, 4)
+        .accessibilityElement(children: .combine)
+        .help("Cablehop \(AppInfo.version)")
     }
 }
 
