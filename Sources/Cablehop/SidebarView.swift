@@ -86,10 +86,13 @@ struct SidebarView: View {
                         .frame(maxWidth: .infinity)
                 }
                 .controlSize(.large)
+                .glassButton()
                 .help("Connect to a phone over Wi-Fi (⌘K). Needs Wireless debugging.")
                 .disabled(ADB.path == nil)
             }
             .padding(12)
+            .glassCard(cornerRadius: 18)
+            .padding(10)
         }
         .alert("Couldn't complete that", isPresented: .init(get: { actionError != nil }, set: { if !$0 { actionError = nil } })) {
             Button("OK") {}

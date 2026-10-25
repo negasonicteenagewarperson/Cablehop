@@ -57,17 +57,23 @@ struct FileBrowserView: View {
                 HStack {
                     Image(systemName: "magnifyingglass")
                     Text("Searching all of Internal Storage for “\(search)”")
-                    Spacer()
                 }
                 .font(.callout)
                 .foregroundStyle(.secondary)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 7)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 6)
+                .glassCapsule()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 8)
             } else {
                 PathBar(path: model.path) { model.navigate(to: $0) }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 8)
                 if !full && !hideMTPBanner {
-                    Divider()
                     FileTransferModeBanner(hidden: $hideMTPBanner)
+                        .padding(.horizontal, 10)
+                        .padding(.bottom, 8)
                 }
             }
             Divider()
@@ -272,6 +278,9 @@ struct FileBrowserView: View {
             .pickerStyle(.segmented)
             .help("View as a list or as a photo grid (⌘1 / ⌘2)")
         }
+        if #available(macOS 26.0, *) {
+            ToolbarSpacer(.fixed, placement: .primaryAction)
+        }
         ToolbarItemGroup(placement: .primaryAction) {
             Button { chooseFilesToUpload() } label: { Label("Upload", systemImage: "square.and.arrow.up") }
                 .help("Upload: send files from your Mac to this folder (⌘U)")
@@ -399,7 +408,12 @@ struct FileBrowserView: View {
 
     private func run(_ action: @escaping () async throws -> Void) {
         Task {
-            do { try await action() } catch { opError = error.localizedDescription }
+            do {
+                try await action()
+            } catch {
+                Log.error("\(error.localizedDescription) [in \(model.path)]", .files)
+                opError = error.localizedDescription
+            }
         }
     }
 
@@ -590,17 +604,19 @@ struct PathBar: View {
                     }
                     Button(crumb.name) { navigate(crumb.path) }
                         .buttonStyle(.plain)
-                        .padding(.horizontal, 6)
+                        .padding(.horizontal, 8)
                         .padding(.vertical, 3)
-                        .background(index == crumbs.count - 1 ? Color.secondary.opacity(0.15) : .clear,
-                                    in: RoundedRectangle(cornerRadius: 5))
+                        .background(index == crumbs.count - 1 ? Color.primary.opacity(0.08) : .clear, in: Capsule())
                         .fontWeight(index == crumbs.count - 1 ? .semibold : .regular)
+                        .help(crumb.path)
                 }
             }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 4)
         }
         .font(.callout)
+        .glassCapsule()
+        .fixedSize(horizontal: false, vertical: true)
     }
 }
 
@@ -628,8 +644,8 @@ struct FileTransferModeBanner: View {
     @State private var showHow = false
 
     var body: some View {
-        HStack(spacing: 8) {
-            Image(systemName: "info.circle").foregroundStyle(Color.accentColor)
+        HStack(spacing: 10) {
+            Image(systemName: "info.circle.fill").font(.title3).foregroundStyle(Color.accentColor)
             Text("File transfer mode: browse and copy files. Search, sync, screenshots and app installs need USB debugging.")
                 .lineLimit(2)
             Button("How to turn it on") { showHow = true }
@@ -642,9 +658,9 @@ struct FileTransferModeBanner: View {
         }
         .font(.callout)
         .foregroundStyle(.secondary)
-        .padding(.horizontal, 12)
-        .padding(.vertical, 6)
-        .background(Color.accentColor.opacity(0.06))
+        .padding(.horizontal, 14)
+        .padding(.vertical, 8)
+        .glassCard(cornerRadius: 14)
     }
 }
 

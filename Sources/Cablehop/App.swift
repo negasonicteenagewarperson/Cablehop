@@ -27,8 +27,15 @@ struct CablehopApp: App {
         .defaultSize(width: 1180, height: 720)
         .commands {
             CablehopCommands(showPairing: { ui.showPairing = true },
-                              toggleTransfers: { TransfersPopover.shared.toggle() })
+                             toggleTransfers: { TransfersPopover.shared.toggle() },
+                             reportProblem: { ui.showReportProblem = true })
         }
+
+        Window("Logs", id: "logs") {
+            LogsView()
+        }
+        .defaultSize(width: 860, height: 540)
+        .commandsRemoved()
 
         Settings {
             SettingsView()
@@ -40,6 +47,7 @@ struct CablehopApp: App {
 @Observable
 final class UIState {
     var showPairing = false
+    var showReportProblem = false
 }
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -47,7 +55,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Lets the app show a Dock icon and menu bar even when launched as a bare binary.
         NSApp.setActivationPolicy(.regular)
         NSApp.activate()
+        Log.info("Cablehop \(AppInfo.version) started on macOS \(ProcessInfo.processInfo.operatingSystemVersionString) (\(LogStore.architecture)); adb \(ADB.path == nil ? "not installed" : "available")")
         DispatchQueue.global(qos: .background).async { Caches.prune() }
+        MainActor.assumeIsolated { Updater.shared.checkInBackgroundIfDue() }
+    }
+
+    func applicationWillTerminate(_ notification: Notification) {
+        Log.info("Cablehop quit")
+        LogStore.shared.flush()
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
@@ -84,9 +99,11 @@ struct ContentView: View {
                         .id(device.serial)
                 } else {
                     DeviceStateView(device: device)
+                        .logoInTitleBar()
                 }
             } else {
                 WelcomeView(showPairing: $ui.showPairing)
+                    .logoInTitleBar()
             }
         }
         .toolbar {
@@ -111,61 +128,11 @@ struct ContentView: View {
         .sheet(isPresented: $ui.showPairing) {
             WirelessPairingView()
         }
-    }
-}
-
-struct SettingsView: View {
-    @AppStorage(Prefs.downloadFolderKey) private var downloadFolder = Prefs.defaultDownloadFolder
-    @AppStorage(Notifier.enabledKey) private var notify = true
-    @State private var cacheSize: Int64?
-
-    var body: some View {
-        Form {
-            Section("Transfers") {
-                LabeledContent("Save downloads to") {
-                    HStack {
-                        Text((downloadFolder as NSString).abbreviatingWithTildeInPath)
-                            .lineLimit(1).truncationMode(.middle)
-                        Button("Choose…") {
-                            let panel = NSOpenPanel()
-                            panel.canChooseDirectories = true
-                            panel.canChooseFiles = false
-                            panel.canCreateDirectories = true
-                            if panel.runModal() == .OK, let url = panel.url { downloadFolder = url.path }
-                        }
-                    }
-                }
-                Toggle("Notify me when transfers finish in the background", isOn: $notify)
-            }
-            Section("Storage") {
-                LabeledContent("Thumbnails & previews") {
-                    HStack {
-                        Text(cacheSize.map { ByteCountFormatter.string(fromByteCount: $0, countStyle: .file) } ?? "…")
-                            .foregroundStyle(.secondary)
-                        Button("Clear") {
-                            Caches.clearAll()
-                            Task { await ThumbnailLoader.shared.clearMemory() }
-                            cacheSize = 0
-                        }
-                    }
-                }
-                Text("Copies of photos and files you open or preview are kept on this Mac for a day, then removed automatically.")
-                    .font(.caption).foregroundStyle(.secondary)
-            }
-            Section("About") {
-                LabeledContent("Version") {
-                    Text(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "development build")
-                        .foregroundStyle(.secondary)
-                }
-                LabeledContent("adb (for USB debugging)") {
-                    Text(ADB.path ?? "Not installed. File transfer still works.").foregroundStyle(.secondary).textSelection(.enabled)
-                }
-            }
+        .sheet(isPresented: $ui.showReportProblem) {
+            ReportProblemView()
         }
-        .formStyle(.grouped)
-        .frame(width: 500)
-        .task {
-            cacheSize = await Task.detached { Caches.size(of: Caches.root) }.value
+        .sheet(isPresented: Bindable(Updater.shared).isPresented) {
+            UpdateView()
         }
     }
 }

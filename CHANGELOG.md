@@ -1,5 +1,25 @@
 # Changelog
 
+## 2.0
+
+### New
+- **Liquid Glass design.** On macOS 26 Tahoe and later, Cablehop uses Apple's new look: glass toolbar and
+  sidebar, a floating glass path bar, glass panels and buttons. (Earlier builds were marked as built with
+  an older SDK, so macOS kept them in the old style.) macOS 14 and 15 get the closest matching materials.
+- **The Cablehop logo** replaces the app name in the window's title area and leads the welcome screen.
+- **Check for Updates.** From the Cablehop menu or Settings › Updates, plus a quiet daily check you can turn
+  off. Updates install themselves and restart the app, after verifying the release's signature, checksum,
+  version and code signature.
+- **Logs.** Cablehop now keeps a private log on your Mac (`~/Library/Logs/Cablehop`). View it, search it,
+  and save the complete log as a text file from Settings › Help or the Help menu.
+- **Report a Problem.** Walks you through saving your logs, then opens GitHub Issues with a bug report form.
+- **New Settings window** with General, Updates, Storage and Help tabs.
+
+### Security
+- Releases are now signed with a private release key; the updater refuses anything else.
+- Logs are readable only by your account, never contain your Mac username, shorten serial numbers and
+  omit Wi-Fi pairing codes. Repeated lines are collapsed so a recurring error can't flood them.
+
 ## 1.4
 
 ### Changed

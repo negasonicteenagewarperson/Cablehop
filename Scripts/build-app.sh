@@ -14,6 +14,13 @@ rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$BIN" "$APP/Contents/MacOS/Cablehop"
 
+# macOS turns on the current design (Liquid Glass on macOS 26 and later) only for apps marked as built
+# with a current SDK. SwiftPM records the deployment target there instead, so stamp the real SDK version.
+SDK_VERSION=$(xcrun --sdk "${SDKROOT:-macosx}" --show-sdk-version)
+vtool -set-build-version macos 14.0 "$SDK_VERSION" -replace \
+  -output "$APP/Contents/MacOS/Cablehop.stamped" "$APP/Contents/MacOS/Cablehop"
+mv "$APP/Contents/MacOS/Cablehop.stamped" "$APP/Contents/MacOS/Cablehop"
+
 # Icon
 ICONSET=$(mktemp -d)/AppIcon.iconset
 mkdir -p "$ICONSET"

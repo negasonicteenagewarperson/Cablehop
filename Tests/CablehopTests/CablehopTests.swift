@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 import Testing
 @testable import Cablehop
@@ -289,5 +290,127 @@ struct RenameMigrationTests {
         let defaults = try #require(UserDefaults(suiteName: "cablehop.tests.empty.\(UUID().uuidString)"))
         RenameMigration.moveSettings(from: "cablehop.tests.missing.\(UUID().uuidString)", into: defaults)
         #expect(defaults.dictionaryRepresentation()["downloadFolder"] == nil)
+    }
+}
+
+@Suite("Updates")
+struct UpdaterTests {
+    @Test func versionsCompareNumerically() throws {
+        let v = { (s: String) in try #require(AppVersion(s)) }
+        #expect(try v("2.0") > v("1.4"))
+        #expect(try v("v2.10") > v("2.9"))
+        #expect(try v("2.0") == v("2.0.0"))
+        #expect(try v("2.0.1") > v("2.0"))
+        #expect(AppVersion("latest") == nil)
+        #expect(AppVersion("") == nil)
+    }
+
+    @Test func findsTheRightChecksum() throws {
+        let hash = String(repeating: "a", count: 64)
+        let listing = "\(String(repeating: "b", count: 64))  Cablehop-2.0.zip\n\(hash)  Cablehop-2.0.dmg\n"
+        #expect(try Updater.checksum(for: "Cablehop-2.0.dmg", in: listing) == hash)
+        #expect(throws: (any Error).self) { try Updater.checksum(for: "Other.dmg", in: listing) }
+        #expect(throws: (any Error).self) { try Updater.checksum(for: "x.dmg", in: "nothex  x.dmg") }
+    }
+
+    @Test func onlyReleasesSignedWithTheReleaseKeyAreTrusted() throws {
+        let key = Curve25519.Signing.PrivateKey()
+        let publicKey = key.publicKey.rawRepresentation.base64EncodedString()
+        let sums = Data("abc  Cablehop-2.1.dmg\n".utf8)
+        let signature = Data(try key.signature(for: sums).base64EncodedString().utf8)
+
+        #expect(try Updater.verifySignature(of: sums, signature: signature, publicKey: publicKey))
+        // Someone edits the checksum list (e.g. to match a malicious download): rejected.
+        #expect(try !Updater.verifySignature(of: Data("evil  Cablehop-2.1.dmg\n".utf8), signature: signature, publicKey: publicKey))
+        // Signed with a different key: rejected.
+        let otherKey = Curve25519.Signing.PrivateKey().publicKey.rawRepresentation.base64EncodedString()
+        #expect(try !Updater.verifySignature(of: sums, signature: signature, publicKey: otherKey))
+        // Garbage signature: rejected.
+        #expect(try !Updater.verifySignature(of: sums, signature: Data("not base64".utf8), publicKey: publicKey))
+    }
+
+    @Test func theShippedPublicKeyIsValid() throws {
+        let raw = try #require(Data(base64Encoded: Updater.releasePublicKey))
+        _ = try Curve25519.Signing.PublicKey(rawRepresentation: raw)
+    }
+
+    @Test func picksReleaseFiles() throws {
+        let json = """
+        {"tag_name":"v2.1","name":"Cablehop 2.1","body":"","html_url":"https://github.com/a/b","draft":false,"prerelease":false,
+         "assets":[{"name":"Cablehop-2.1.zip","size":1,"browser_download_url":"https://github.com/a/b/1"},
+                   {"name":"Cablehop-2.1.dmg","size":2,"browser_download_url":"https://github.com/a/b/2"},
+                   {"name":"SHA256SUMS.txt","size":3,"browser_download_url":"https://github.com/a/b/3"},
+                   {"name":"SHA256SUMS.txt.sig","size":4,"browser_download_url":"https://github.com/a/b/4"}]}
+        """
+        let release = try JSONDecoder().decode(Release.self, from: Data(json.utf8))
+        #expect(release.version?.description == "2.1")
+        #expect(release.diskImage?.name == "Cablehop-2.1.dmg")
+        #expect(release.checksums?.size == 3)
+        #expect(release.signature?.size == 4)
+    }
+
+    @Test func onlyUpdatesAppsInNormalLocations() {
+        #expect(!Updater.canReplace(URL(fileURLWithPath: "/Volumes/Cablehop 2.0/Cablehop.app")))
+        #expect(!Updater.canReplace(URL(fileURLWithPath: "/private/var/folders/x/AppTranslocation/y/d/Cablehop.app")))
+        #expect(!Updater.canReplace(URL(fileURLWithPath: "/tmp/not-an-app")))
+    }
+}
+
+@Suite("Logs")
+struct LogTests {
+    @Test func homeFolderIsHidden() {
+        #expect(LogStore.redact("Saved \(NSHomeDirectory())/Downloads/a.jpg") == "Saved ~/Downloads/a.jpg")
+    }
+
+    @Test func adbCommandsDontLeakSerialsOrPairingCodes() {
+        #expect(ADB.describe(["-s", "5A080DLCQ002HU", "shell", "ls"]) == "-s …02HU shell ls")
+        #expect(ADB.describe(["pair", "192.168.1.20:37099", "123456"]) == "pair 192.168.1.20:37099 ••••••")
+    }
+
+    @Test func writesRotatesAndExports() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("cablehop-logs-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let store = LogStore(directory: dir)
+        let line = String(repeating: "x", count: 1000)
+        for i in 0..<5000 { store.append(level: .info, category: .app, message: "\(i) \(line)") }
+        store.flush()
+
+        // About 5 MB written: it rotated into older files, and never kept more than five.
+        #expect(store.files.count >= 2 && store.files.count <= 5)
+        let attributes = try FileManager.default.attributesOfItem(atPath: store.currentFile.path)
+        #expect((attributes[.posixPermissions] as? Int) == 0o600)  // only you can read it
+        let directoryAttributes = try FileManager.default.attributesOfItem(atPath: dir.path)
+        #expect((directoryAttributes[.posixPermissions] as? Int) == 0o700)
+
+        let export = store.exportText()
+        #expect(export.hasPrefix("Cablehop logs"))
+        #expect(export.contains("Cablehop version:") && export.contains("macOS:"))
+        #expect(export.contains("4999 x"))  // newest line is there
+
+        store.clear()
+        #expect(store.files.isEmpty)
+    }
+}
+
+@Suite("Log noise")
+struct LogNoiseTests {
+    @Test func repeatedMessagesAreCollapsed() {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("cablehop-logs-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let store = LogStore(directory: dir)
+        for _ in 0..<100 { store.append(level: .warning, category: .adb, message: "adb devices failed") }
+        store.append(level: .info, category: .device, message: "Phone connected")
+        let text = store.contents()
+        #expect(text.components(separatedBy: "adb devices failed").count - 1 == 1)
+        #expect(text.contains("repeated 99 more times"))
+        #expect(text.contains("Phone connected"))
+    }
+}
+
+@Suite("Test isolation")
+struct TestIsolationTests {
+    @Test func testsNeverWriteToTheRealLogs() {
+        #expect(LogStore.isRunningTests)
+        #expect(!LogStore.shared.directory.path.contains("Library/Logs"))
     }
 }

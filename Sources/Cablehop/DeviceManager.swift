@@ -76,7 +76,10 @@ final class DeviceManager {
             if let sdk = info[list[index].serial]?.sdk, sdk > 0, sdk < 23 { list[index].state = .unsupported }
         }
         list += refreshMTP(adbDevices: list)
-        if list != devices { devices = list }
+        if list != devices {
+            logChanges(from: devices, to: list)
+            devices = list
+        }
 
         if selectedSerial == nil || !list.contains(where: { $0.serial == selectedSerial }) {
             selectedSerial = list.first(where: { $0.state == .device })?.serial ?? list.first?.serial
@@ -161,10 +164,12 @@ final class DeviceManager {
             case .success(let fs):
                 Phones.register(serial, fs)
                 mtpErrors[serial] = nil
+                Log.info("File-transfer session opened: \(fs.conn.manufacturer) \(fs.displayName), \(fs.storages.count) storage area(s)\(fs.isLocked ? ", phone locked" : "")", .device)
             case .failure(MTPError.unresponsive) where (mtpLastReset[serial] ?? .distantPast) < Date().addingTimeInterval(-60):
                 // Usually a session left stuck by an interrupted copy: reset the USB link once and try again.
                 resetUSB(key, serial: serial)
             case .failure(let error):
+                Log.error("Couldn't open the phone for file transfer: \(error.localizedDescription)", .device)
                 mtpErrors[serial] = error.localizedDescription
                 mtpRetryAt[serial] = Date().addingTimeInterval(5)
             }
@@ -188,9 +193,27 @@ final class DeviceManager {
     }
 
     private func resetUSB(_ candidateKey: String, serial: String) {
+        Log.warning("Resetting the phone's USB connection to clear a stuck session", .device)
         mtpLastReset[serial] = Date()
         mtpRetryAt[serial] = Date().addingTimeInterval(4)  // give the phone time to come back
         DispatchQueue.global(qos: .userInitiated).async { MTPDiscovery.resetDevice(candidateKey) }
+    }
+
+    private func logChanges(from old: [Device], to new: [Device]) {
+        func describe(_ d: Device) -> String {
+            let mode = d.isMTP ? "file transfer" : d.isWireless ? "Wi-Fi" : "USB debugging"
+            return "\(displayName(for: d)) [\(mode), …\(d.serial.suffix(4))]"
+        }
+        let oldBySerial = Dictionary(old.map { ($0.serial, $0) }, uniquingKeysWith: { a, _ in a })
+        let newSerials = Set(new.map(\.serial))
+        for d in new {
+            if let before = oldBySerial[d.serial] {
+                if before.state != d.state { Log.info("\(describe(d)): \(before.state.rawValue) → \(d.state.rawValue)", .device) }
+            } else {
+                Log.info("Phone connected: \(describe(d)), state \(d.state.rawValue)", .device)
+            }
+        }
+        for d in old where !newSerials.contains(d.serial) { Log.info("Phone disconnected: \(describe(d))", .device) }
     }
 
     func retryMTP(_ serial: String) {
@@ -211,16 +234,20 @@ final class DeviceManager {
     func pair(address: String, code: String) async throws {
         let r = try await ADB.run(["pair", address, code])
         guard r.combined.localizedCaseInsensitiveContains("successfully paired") else {
+            Log.warning("Wireless pairing failed: \(r.combined.prefix(200))", .wireless)
             throw ADBError.failed(r.combined.isEmpty ? "Pairing failed." : r.combined)
         }
+        Log.info("Wireless pairing succeeded", .wireless)
     }
 
     func connect(_ address: String) async throws {
         let r = try await ADB.run(["connect", address])
         let text = r.combined
         guard text.hasPrefix("connected to") || text.contains("already connected") else {
+            Log.warning("Wi-Fi connection failed: \(text.prefix(200))", .wireless)
             throw ADBError.failed(text.isEmpty ? "Couldn't connect to \(address)." : text)
         }
+        Log.info("Connected over Wi-Fi", .wireless)
         recentAddresses = [address] + recentAddresses.filter { $0 != address }
         await refresh()
         if devices.contains(where: { $0.serial == address }) { selectedSerial = address }

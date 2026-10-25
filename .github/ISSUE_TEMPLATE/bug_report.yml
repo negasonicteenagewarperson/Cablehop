@@ -1,0 +1,58 @@
+name: Bug report
+description: Something isn't working in Cablehop
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this! Before you start, save your logs: in Cablehop open
+        **Settings › Help › Save Logs…** (or **Help › Save Logs…**) and keep the file handy for the last box below.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+      placeholder: I dragged a 2 GB video from the phone to the Desktop and the transfer stopped at 40%…
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Connect the phone in File transfer mode
+        2. Open DCIM › Camera
+        3. …
+  - type: input
+    id: version
+    attributes:
+      label: Cablehop version
+      description: Cablehop › About Cablehop
+      placeholder: "2.0"
+    validations:
+      required: true
+  - type: input
+    id: mac
+    attributes:
+      label: Mac and macOS version
+      placeholder: MacBook Air M2, macOS 26.1
+  - type: input
+    id: phone
+    attributes:
+      label: Phone and Android version
+      placeholder: Pixel 9, Android 16
+  - type: dropdown
+    id: mode
+    attributes:
+      label: How is the phone connected?
+      options:
+        - USB, File transfer
+        - USB, USB debugging
+        - Wi-Fi
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Drag the saved log file into this box. Logs can include file and folder names from your phone, so have a look first.
+    validations:
+      required: true

@@ -115,7 +115,7 @@ final class MTPConnection: @unchecked Sendable {
             do {
                 try handshake(timeout: 10)
             } catch {
-                MTPConnection.log("handshake failed (\(error.localizedDescription)); resetting")
+                Log.warning("Handshake failed (\(error.localizedDescription)); resetting the link", .mtp)
                 resetLink()
                 do {
                     try handshake(timeout: 15)
@@ -166,9 +166,7 @@ final class MTPConnection: @unchecked Sendable {
     }
 
     static func log(_ message: String) {
-        #if DEBUG
-        print("[MTP]", message)
-        #endif
+        Log.info(message, .mtp)
     }
 
     /// Resets the USB link and reopens the session after a failure, without replugging.

@@ -5,3 +5,7 @@ dist/
 *.xcodeproj/
 DerivedData/
 .DS_Store
+
+# Release signing keys never belong in the repository
+*.key
+.cablehop-release-key

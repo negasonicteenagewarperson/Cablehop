@@ -44,7 +44,9 @@ Google's old *Android File Transfer* app is discontinued, and the alternatives a
 
 Cablehop fills that gap. Connect your phone and it shows up in the sidebar. Browse its folders,
 see your photos as thumbnails, and drag files between it and Finder. It looks and behaves like a
-Mac app: Finder-style lists, Quick Look, the usual keyboard shortcuts, Light and Dark Mode.
+Mac app: Apple's Liquid Glass design on macOS 26 and later, Finder-style lists, Quick Look, the usual
+keyboard shortcuts, Light and Dark Mode. It keeps itself up to date, and if something goes wrong,
+**Help › Report a Problem** walks you through sending a useful bug report.
 
 It works in two ways:
 
@@ -61,7 +63,7 @@ You can start with file transfer and switch on the extras later. Cablehop notice
 | | |
 |---|---|
 | **Mac** | Any Apple silicon Mac (M1 through M5, including Pro, Max and Ultra) or Intel Mac |
-| **macOS** | 14 Sonoma or later (every Apple silicon Mac can run it) |
+| **macOS** | 14 Sonoma or later (every Apple silicon Mac can run it). Liquid Glass design on macOS 26 Tahoe and later |
 | **Phone** | Any Android phone: Google Pixel, Samsung, Xiaomi, OnePlus, Motorola, Sony, Nothing, Oppo, Vivo, Huawei and others |
 | **Android** | File transfer: every version. USB-debugging features: Android 6.0 or later. Wi-Fi pairing: Android 11 or later |
 | **Cable** | A USB cable that carries data (some cheap cables only charge) |
@@ -235,12 +237,34 @@ Keep a phone folder and a Mac folder up to date, for example backing up your cam
 - **Install apps**: choose *Install App (APK)…* from the toolbar's More menu, or drop `.apk` files
   onto the phone in the sidebar.
 
+### Updates
+
+- **Check for Updates…** in the Cablehop menu, or **Settings › Updates › Check Now**.
+- Cablehop also checks quietly once a day (you can turn this off) and only speaks up when there's a new
+  version. You see what's new, then choose **Install Update**, **Remind Me Later** or **Skip This Version**.
+- **Install Update** downloads the new version, checks it (see [Privacy and security](#privacy-and-security)),
+  replaces the app and restarts it. If Cablehop is running from somewhere it can't update itself, like the
+  disk image, it saves the new version to Downloads and opens it so you can drag it to Applications.
+
+### Logs and getting help
+
+- Cablehop keeps a **log** of what it does (phones connecting, transfers, errors) to help fix problems.
+  It's stored **only on your Mac**, in `~/Library/Logs/Cablehop`, readable only by your account, and
+  capped at about 10 MB. Your Mac username is never written to it.
+- **View Logs** (Help menu, ⌥⌘L, or Settings › Help) opens a searchable log window, with a filter for
+  just warnings and errors.
+- **Save Logs…** saves the complete log as a text file, with your Cablehop, macOS and Mac model at the
+  top, ready to attach to a bug report.
+- **Report a Problem…** (Help menu or Settings › Help) walks you through it: first save your logs, then
+  open [GitHub Issues](https://github.com/negasonicteenagewarperson/Cablehop/issues/new/choose), choose
+  *Bug report*, describe what happened and drag in the log file.
+
 ### Settings (⌘,)
 
-- Where downloads are saved.
-- Notifications on or off.
-- How much space thumbnails and previews use, with a **Clear** button.
-- The app version and which `adb` it's using.
+- **General**: where downloads are saved, notifications on or off, and which `adb` Cablehop uses.
+- **Updates**: automatic checks on or off, the current version, when it last checked, and **Check Now**.
+- **Storage**: how much space thumbnails, previews and logs use, with a **Clear** button.
+- **Help**: View Logs, Save Logs, Report a Problem, and a link to this page.
 
 ### Which features need what
 
@@ -275,12 +299,21 @@ Keep a phone folder and a Mac folder up to date, for example backing up your cam
 | Transfers | ⌥⌘T |
 | Phone screenshot | ⇧⌘S |
 | Connect wirelessly | ⌘K |
+| View logs | ⌥⌘L |
 | Settings | ⌘, |
 
 ## Privacy and security
 
-- **Offline by design.** Cablehop talks only to your phone, over USB or your local Wi-Fi. No accounts,
-  no analytics, no internet connections.
+- **Nothing about you leaves your Mac.** Cablehop talks to your phone over USB or your local Wi-Fi. The
+  only internet connection it makes is to ask GitHub whether a new version exists (once a day, which
+  you can turn off in Settings › Updates) and to download it if you choose to. No accounts, no analytics.
+- **Updates are verified before they're installed.** Each release's checksum list is signed with
+  Cablehop's private release key, which never leaves the developer's Mac. Cablehop installs an update
+  only if that signature is valid, the download matches its checksum, and the app inside is Cablehop at
+  the advertised version with an intact code signature. So even someone who took over the GitHub
+  account couldn't push a fake update. Downloads come only from this project's GitHub releases, over HTTPS.
+- **Logs stay local and private.** See [Logs and getting help](#logs-and-getting-help). Serial numbers
+  are shortened and Wi-Fi pairing codes are never written down.
 - **Downloaded files are checked by macOS.** Everything copied from the phone is marked as downloaded,
   so Gatekeeper checks any apps or scripts among them before they can run, just as it does for Safari
   and AirDrop downloads.
@@ -309,6 +342,8 @@ Keep a phone folder and a Mac folder up to date, for example backing up your cam
   File transfer, which works on every version.
 - **Wi-Fi pairing can't find the phone.** Both devices must be on the same network, and some guest or
   office networks block devices from seeing each other.
+- **Something else?** Use **Help › Report a Problem…**: save your logs, then open an issue on GitHub
+  with the log file attached.
 
 ## FAQ
 
@@ -335,8 +370,13 @@ cd Cablehop
 ./Scripts/test.sh        # run the unit tests
 ./Scripts/build-app.sh   # build build/Cablehop.app
 ./Scripts/make-dmg.sh    # package it as dist/Cablehop-<version>.dmg
-./Scripts/release.sh     # all of the above, plus a .zip and SHA256SUMS.txt
+./Scripts/release.sh     # all of the above, plus a .zip and a signed SHA256SUMS.txt
 ```
+
+**Release signing.** The in-app updater only installs releases whose `SHA256SUMS.txt` is signed with the
+project's Ed25519 release key. `release.sh` signs it automatically using `~/.cablehop-release-key`; create
+one with `swift Scripts/sign-release.swift --generate` and put its public key in `Updater.swift`. Keep the
+private key backed up and out of the repository (it's in `.gitignore`).
 
 Run `make-dmg.sh` from Terminal so it can arrange the DMG window; macOS asks once for permission to
 control Finder. If that's declined, the DMG still works with Finder's default layout.

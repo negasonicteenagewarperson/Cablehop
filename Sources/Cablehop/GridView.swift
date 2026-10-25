@@ -42,17 +42,20 @@ struct FileGridView: View {
             .focusEffectDisabled()
             .onTapGesture { selection.removeAll() }
             .contextMenu { MenuSpecView(specs: menu([])) }
-
-            HStack {
-                Spacer()
-                Image(systemName: "photo").font(.caption2)
-                Slider(value: $cellSize, in: 80...240).frame(width: 120).controlSize(.mini)
-                    .help("Thumbnail size")
-                Image(systemName: "photo").font(.callout)
+            // Floating size control, like Photos.
+            .overlay(alignment: .bottomTrailing) {
+                HStack(spacing: 8) {
+                    Image(systemName: "photo").font(.caption2)
+                    Slider(value: $cellSize, in: 80...240).frame(width: 120).controlSize(.small)
+                    Image(systemName: "photo").font(.callout)
+                }
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .glassCapsule()
+                .padding(14)
+                .help("Thumbnail size")
             }
-            .foregroundStyle(.secondary)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 3)
         }
     }
 

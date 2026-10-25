@@ -5,11 +5,13 @@ struct WelcomeView: View {
 
     var body: some View {
         VStack(spacing: 24) {
-            Image(systemName: "iphone.gen3.radiowaves.left.and.right")
-                .font(.system(size: 56))
-                .foregroundStyle(Color.accentColor)
-            Text("Connect your Android phone").font(.largeTitle.bold())
-            HStack(alignment: .top, spacing: 32) {
+            AppLogo(size: 112)
+                .shadow(color: .black.opacity(0.15), radius: 12, y: 6)
+            VStack(spacing: 6) {
+                Text("Connect your Android phone").font(.largeTitle.bold())
+                Text("Plug it in with a USB cable, or connect over Wi-Fi.").font(.title3).foregroundStyle(.secondary)
+            }
+            HStack(alignment: .top, spacing: 20) {
                 StepCard(icon: "cable.connector", title: "Just plug it in", steps: [
                     "Connect the phone with a USB cable and unlock it",
                     "Pull down notifications › tap the USB notification",
@@ -25,10 +27,13 @@ struct WelcomeView: View {
                 Text("USB debugging features also need Google's free adb tool: `brew install android-platform-tools`")
                     .font(.callout).foregroundStyle(.secondary).textSelection(.enabled)
             }
-            Button("Connect Wirelessly…") { showPairing = true }
-                .controlSize(.large)
-                .help("Connect over Wi-Fi. Needs Wireless debugging (Android 11+) and adb")
-                .disabled(ADB.path == nil)
+            Button { showPairing = true } label: {
+                Label("Connect Wirelessly…", systemImage: "wifi")
+            }
+            .controlSize(.extraLarge)
+            .glassButton()
+            .help("Connect over Wi-Fi. Needs Wireless debugging (Android 11+) and adb")
+            .disabled(ADB.path == nil)
         }
         .padding(40)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -41,19 +46,19 @@ private struct StepCard: View {
     let steps: [String]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Label(title, systemImage: icon).font(.headline)
+        VStack(alignment: .leading, spacing: 12) {
+            Label(title, systemImage: icon).font(.headline).foregroundStyle(.primary)
             ForEach(Array(steps.enumerated()), id: \.offset) { index, step in
                 HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Text("\(index + 1)").font(.caption.bold()).frame(width: 18, height: 18)
-                        .background(Color.accentColor.opacity(0.15), in: Circle())
+                    Text("\(index + 1)").font(.caption.bold()).foregroundStyle(.white).frame(width: 20, height: 20)
+                        .background(Color.accentColor, in: Circle())
                     Text(step).fixedSize(horizontal: false, vertical: true)
                 }
             }
         }
-        .padding(16)
-        .frame(width: 270, alignment: .leading)
-        .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 12))
+        .padding(18)
+        .frame(width: 280, alignment: .leading)
+        .glassCard(cornerRadius: 22)
     }
 }
 

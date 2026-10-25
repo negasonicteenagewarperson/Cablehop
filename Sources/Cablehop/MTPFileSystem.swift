@@ -166,10 +166,11 @@ final class MTPFileSystem: @unchecked Sendable {
         do {
             return try operation()
         } catch let error as MTPError where error.isLinkFailure {
-            MTPConnection.log("link failure (\(error.localizedDescription)); recovering")
+            Log.warning("USB link failure (\(error.localizedDescription)); recovering", .mtp)
             do {
                 try conn.recover()
             } catch {
+                Log.error("Couldn't recover the USB link; the phone will be reset", .mtp)
                 lock.withLock { broken = true }
                 throw MTPError.unresponsive
             }

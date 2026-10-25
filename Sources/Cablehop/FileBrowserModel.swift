@@ -85,6 +85,7 @@ final class FileBrowserModel {
                 guard !Task.isCancelled, target == path else { return }
                 files = []
                 self.error = error.localizedDescription
+                Log.warning("Couldn't open \(target): \(error.localizedDescription)", .files)
             }
             isLoading = false
             hasLoaded = true

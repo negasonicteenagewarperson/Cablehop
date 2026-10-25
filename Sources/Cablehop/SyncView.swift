@@ -91,7 +91,7 @@ struct SyncView: View {
                         save(job)
                         Task { await run(job) }
                     }
-                    .buttonStyle(.borderedProminent)
+                    .prominentGlassButton()
                     .disabled(runningJob != nil || draft.remotePath.isEmpty)
                 }
                 .padding([.horizontal, .bottom], 6)
@@ -157,6 +157,7 @@ struct SyncView: View {
             } else {
                 try? FileManager.default.createDirectory(atPath: job.localPath, withIntermediateDirectories: true)
                 transfers.enqueue(plan.copies, direction: job.direction == .phoneToMac ? .pull : .push, serial: device.serial)
+                Log.info("Sync \(job.direction.label): \(plan.copies.count) to copy, \(plan.upToDate) up to date", .sync)
                 let size = ByteCountFormatter.string(fromByteCount: plan.bytes, countStyle: .file)
                 status = ("Copying \(plan.copies.count) files (\(size)). \(plan.upToDate) were already up to date.", false)
             }
@@ -165,6 +166,7 @@ struct SyncView: View {
             save(updated)
         } catch {
             status = (error.localizedDescription, true)
+            Log.warning("Sync failed: \(error.localizedDescription)", .sync)
         }
     }
 

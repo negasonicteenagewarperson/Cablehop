@@ -53,6 +53,14 @@ final class Transfer: Identifiable {
         if clamped >= 1 || abs(clamped - progress) >= 0.005 { progress = clamped }
     }
 
+    /// "download of “IMG_1234.jpg” (4.2 MB, file transfer)" for the logs.
+    var logLabel: String {
+        let kind = direction == .push ? "upload" : direction == .pull ? "download" : "app install"
+        let size = totalBytes.map { ByteCountFormatter.string(fromByteCount: $0, countStyle: .file) } ?? "size unknown"
+        let mode = Phones.isMTP(serial) ? "file transfer" : "adb"
+        return "\(kind) of “\(name)”\(isDirectory ? " (folder)" : "") (\(size), \(mode))"
+    }
+
     /// Where a download is written until it completes.
     var partialPath: String { destination + ".cablehop-part" }
 
@@ -122,6 +130,11 @@ final class TransferManager {
 
     func endExternal(_ transfer: Transfer?, error: Error?) {
         guard let transfer else { return }
+        if let error {
+            Log.error("Drag to Finder failed for \(transfer.logLabel): \(error.localizedDescription)", .transfer)
+        } else {
+            Log.info("Dragged to Finder: \(transfer.logLabel)", .transfer)
+        }
         if let error {
             transfer.state = .failed(error.localizedDescription)
             batchFailed += 1
@@ -284,6 +297,7 @@ final class TransferManager {
     }
 
     private func start(_ transfer: Transfer) {
+        Log.info("Started \(transfer.logLabel)", .transfer)
         if Phones.isMTP(transfer.serial) {
             startMTP(transfer)
             return
@@ -414,10 +428,13 @@ final class TransferManager {
             transfer.progress = 1
             transfer.detail = transfer.direction == .install ? "Installed" : isMTP ? output : TransferOutput.summary(output)
             batchDone += 1
+            Log.info("Finished \(transfer.logLabel): \(transfer.detail)", .transfer)
         } else {
             transfer.state = .failed(failure)
             batchFailed += 1
+            Log.error("Failed \(transfer.logLabel): \(failure)", .transfer)
         }
+        if transfer.state == .cancelled { Log.info("Cancelled \(transfer.logLabel)", .transfer) }
         record(transfer)
         lastCompleted = transfer
         completionTick += 1

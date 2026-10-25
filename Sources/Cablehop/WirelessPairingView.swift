@@ -190,7 +190,7 @@ private struct CodePairingPane: View {
             .frame(height: 120)
             HStack {
                 Button("Pair & Connect") { Task { await pair() } }
-                    .buttonStyle(.borderedProminent)
+                    .prominentGlassButton()
                     .keyboardShortcut(.defaultAction)
                     .disabled(address.isEmpty || code.count < 6 || phase == .working)
                 if let phase { StatusLine(phase: phase, text: status) }
@@ -299,7 +299,7 @@ private struct ManualPane: View {
                     .textFieldStyle(.roundedBorder)
                     .onSubmit { Task { await connect(address) } }
                 Button("Connect") { Task { await connect(address) } }
-                    .buttonStyle(.borderedProminent)
+                    .prominentGlassButton()
                     .disabled(address.isEmpty || phase == .working)
             }
             if !dm.recentAddresses.isEmpty {

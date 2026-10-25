@@ -43,10 +43,30 @@ enum ADB {
     /// Runs adb and collects its output. The process is killed if it outlives `timeout`
     /// (nil = no limit) or if the calling task is cancelled.
     static func run(_ args: [String], timeout: TimeInterval? = 30) async throws -> ADBResult {
-        let r = try await runRaw(args, timeout: timeout)
-        return ADBResult(out: String(decoding: r.out, as: UTF8.self),
-                         err: String(decoding: r.err, as: UTF8.self),
-                         code: r.code)
+        let r: (out: Data, err: Data, code: Int32)
+        do {
+            r = try await runRaw(args, timeout: timeout)
+        } catch is CancellationError {
+            throw CancellationError()
+        } catch {
+            Log.warning("adb \(describe(args)): \(error.localizedDescription)", .adb)
+            throw error
+        }
+        let result = ADBResult(out: String(decoding: r.out, as: UTF8.self),
+                               err: String(decoding: r.err, as: UTF8.self),
+                               code: r.code)
+        if r.code != 0 {
+            Log.debug("adb \(describe(args)) exited \(r.code): \(result.combined.prefix(300))", .adb)
+        }
+        return result
+    }
+
+    /// A short, log-friendly version of an adb command line (serial numbers shortened).
+    static func describe(_ args: [String]) -> String {
+        var parts = args
+        if let i = parts.firstIndex(of: "-s"), i + 1 < parts.count { parts[i + 1] = "…" + parts[i + 1].suffix(4) }
+        if let i = parts.firstIndex(of: "pair"), i + 2 < parts.count { parts[i + 2] = "••••••" }  // pairing code
+        return String(parts.joined(separator: " ").prefix(200))
     }
 
     /// Like `run`, but returns stdout as raw bytes (for `exec-out` binary data).

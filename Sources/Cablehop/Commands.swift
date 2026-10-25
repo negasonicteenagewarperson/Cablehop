@@ -41,8 +41,25 @@ struct CablehopCommands: Commands {
     @FocusedValue(\.browser) private var browser
     let showPairing: () -> Void
     let toggleTransfers: () -> Void
+    let reportProblem: () -> Void
+    @Environment(\.openWindow) private var openWindow
+    @Environment(\.openURL) private var openURL
 
     var body: some Commands {
+        CommandGroup(after: .appInfo) {
+            Button("Check for Updates…") { Task { await Updater.shared.check(userInitiated: true) } }
+        }
+
+        CommandGroup(replacing: .help) {
+            Button("Report a Problem…") { reportProblem() }
+            Button("View Logs") { openWindow(id: "logs") }
+                .keyboardShortcut("l", modifiers: [.command, .option])
+            Button("Save Logs…") { LogStore.saveWithPanel() }
+            Divider()
+            Button("Cablehop on GitHub") { openURL(AppInfo.repositoryURL) }
+            Button("Release Notes") { openURL(AppInfo.releasesURL) }
+        }
+
         CommandGroup(replacing: .newItem) {
             Button("New Folder") { browser?.newFolder() }
                 .keyboardShortcut("n", modifiers: [.command, .shift])
