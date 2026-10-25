@@ -96,7 +96,7 @@ You can start with file transfer and switch on the extras later. Cablehop notice
 | **Phone** | Any Android phone: Google Pixel, Samsung, Xiaomi, OnePlus, Motorola, Sony, Nothing, Oppo, Vivo, Huawei and others |
 | **Android** | File transfer: every version. USB-debugging features: Android 6.0 or later. Wi-Fi pairing: Android 11 or later |
 | **Cable** | A USB cable that carries data (some cheap cables only charge) |
-| **Optional** | For the USB-debugging features, Google's free platform tools: `brew install android-platform-tools` |
+| **Optional** | For the USB-debugging features, Google's free platform tools: `brew install android-platform-tools`, or download them from [Google's official Platform-Tools page](https://developer.android.com/tools/releases/platform-tools) ([how to set them up](#unlocking-every-feature-usb-debugging)) |
 
 ## Install
 
@@ -162,8 +162,12 @@ The phone appears in Cablehop's sidebar within a couple of seconds. If it's lock
 
 ### Unlocking every feature (USB debugging)
 
-1. Install Google's platform tools once: `brew install android-platform-tools`
-   (needs [Homebrew](https://brew.sh)).
+1. Install Google's free platform tools once, either way:
+   - **With [Homebrew](https://brew.sh):** `brew install android-platform-tools`
+   - **Or from Google:** download *SDK Platform-Tools for Mac* from Google's
+     [official Platform-Tools page](https://developer.android.com/tools/releases/platform-tools),
+     unzip it, and move the `platform-tools` folder into `~/Library/Android/sdk/` in your home folder.
+     Create the `Android` and `sdk` folders if they aren't there. That's where Cablehop looks for it.
 2. On the phone, open **Settings › About phone** and tap **Build number** seven times. You'll see
    *"You are now a developer"*.
 3. Go to **Settings › System › Developer options** and turn on **USB debugging**.
