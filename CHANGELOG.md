@@ -1,0 +1,81 @@
+# Changelog
+
+## 1.4
+
+### Changed
+- **New name: Cablehop** (formerly DroidDock). The app, its installer, and the GitHub project are all
+  renamed. Your settings, saved folder syncs, transfer history and caches move over automatically the
+  first time you open Cablehop, and the old copies are removed.
+- If you had the previous version in Applications, drag Cablehop in and delete the old app.
+
+## 1.3
+
+### Changed
+- **Transfers button, Safari style.** An icon with a thin progress bar beneath it; while copying,
+  the icon turns green and pulses (steady with Reduce Motion). The percentage is in the tooltip.
+
+### Fixed
+- **The transfers list opens reliably.** It's now a native popover, and the button keeps a fixed
+  size, so the toolbar no longer rebuilds it mid-transfer (which closed the list as it opened). A
+  click on the button while the list is open closes it instead of reopening it. When the window is
+  too narrow to show the button, the list opens from the window's corner.
+- Progress updates are throttled, so fast copies no longer redraw the window hundreds of times a second.
+
+### Compatibility
+- Folders can't show up empty on phones that implement MTP's bulk listing wrongly (seen on several
+  Android versions and makers): items are always listed one way, and details filled in the fast way.
+- Samsung, Xiaomi and other phones that label MTP as a vendor-specific interface are detected.
+- Phones without a USB serial number (common on budget phones) stay connected instead of
+  reconnecting on every check.
+- iPhones, iPads, digital cameras and the phone's own USB-debugging interface are never taken over.
+- The file-transfer session opens the way the MTP spec and libmtp do, with more time for slow phones.
+- Android 5 and earlier over USB debugging get a clear message to use File transfer instead.
+- Names longer than the phone allows are refused instead of silently cut short.
+- Faster listing of folders with thousands of items.
+
+## 1.2
+
+### Fixed
+- **Uploads over about 1 MB no longer get stuck at 0%.** In File transfer mode, Cablehop split uploads into
+  USB transfers in a way Android read as "file finished" after the first megabyte, so it stopped reading
+  and the connection wedged. Every transfer except the last is now a whole number of USB packets.
+- Uploads can no longer be interrupted by thumbnails, folder refreshes or a second upload landing
+  between the two steps of a file-transfer upload.
+- With USB debugging, progress now moves for apps opened from Finder (adb only reported progress when
+  started from Terminal).
+- Folder uploads show progress from the start instead of sitting at 0% until done.
+- A phone left stuck by an interrupted copy is reset over USB automatically and reconnected, with no
+  replugging. If it still doesn't answer (usually because it's locked), Cablehop says so.
+- Waits longer for the phone to finish saving a large file before treating it as unresponsive.
+
+### Changed
+- The transfers button turns into a green pill showing overall progress, glowing on and off while
+  anything is copying. Reduce Motion keeps it steady.
+- The transfers list opens by itself when a copy starts, and closes itself a few seconds after
+  everything finishes (it stays open if something failed).
+
+## 1.1
+
+### New
+- **Works without USB debugging.** Phones in plain *File transfer* (MTP) mode are detected automatically:
+  browse, copy both ways, new folder, rename, delete, Quick Look, and photo and video thumbnails.
+  Features that need USB debugging are greyed out with a note explaining how to turn them on.
+- **Transfers button.** A small toolbar button with a progress ring replaces the side panel. Click it
+  for progress, speed, time left and a history that's kept between launches.
+- Tooltips on every toolbar button, including their keyboard shortcuts.
+- Version shown in Settings and the About window.
+- Universal app (Apple silicon and Intel).
+
+### Fixed
+- Dragging files from the phone into Finder now works. Files are copied straight to where you drop
+  them, and the copy shows up in Transfers.
+- Dropping files from Finder onto the phone works first time, anywhere in the list, and dropping onto
+  a folder sends files into that folder.
+- A phone whose file-transfer connection was left stuck by an interrupted session is reset
+  automatically instead of failing to open. Mid-session USB hiccups are retried once.
+- Copy, Cut and Paste in the Edit menu work in the list view.
+
+## 1.0
+
+First release: browse and transfer files over USB debugging or Wi-Fi, photo grid, folder sync,
+whole-phone search, copy/paste on the phone, screenshots, APK installs, and wireless pairing by QR code.
