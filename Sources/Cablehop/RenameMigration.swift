@@ -9,8 +9,20 @@ enum RenameMigration {
 
     static func run() {
         moveSettings(from: oldBundleID, into: .standard)
+        removeEmptySettingsFile(for: oldBundleID)
         moveCaches()
         removeOldWindowState()
+    }
+
+    /// macOS leaves a blank settings file behind after a domain is cleared; delete it once it's empty.
+    static func removeEmptySettingsFile(for domain: String) {
+        CFPreferencesAppSynchronize(domain as CFString)
+        let library = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask)[0]
+        let file = library.appendingPathComponent("Preferences/\(domain).plist")
+        guard let data = try? Data(contentsOf: file),
+              let contents = try? PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any],
+              contents.isEmpty else { return }  // never delete a file that still holds settings
+        try? FileManager.default.removeItem(at: file)
     }
 
     /// Copies every old setting that hasn't been set under the new name, then deletes the old settings file.
