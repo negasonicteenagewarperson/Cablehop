@@ -1,5 +1,23 @@
 # Changelog
 
+## 2.4
+
+### Fixed
+- **Dropping files onto a folder asks before replacing.** Dropping onto the window already asked when
+  a file with the same name was on the phone, but dropping onto a folder in the list replaced same-named
+  files inside it without asking. It now checks that folder first.
+- **Downloads never overwrite a file on your Mac.** If something takes a download's name before it
+  finishes (for example when you retry a failed download), the copy is saved as "Name 2" instead.
+- **No leftover half-finished files.** Quitting during a download no longer leaves a `.cablehop-part`
+  file behind in the download folder.
+- **Screenshots from a Wi-Fi phone** with no model name get a normal file name instead of one with
+  colons in it.
+
+### Changed
+- **Ready for future macOS updates.** Check for Updates now opens the downloaded installer with
+  `diskutil`, which newer macOS uses in place of the deprecated `hdiutil attach`. Older macOS
+  versions keep using `hdiutil`.
+
 ## 2.2
 
 ### Changed

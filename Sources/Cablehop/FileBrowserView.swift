@@ -447,9 +447,19 @@ struct FileBrowserView: View {
 
     private func upload(_ urls: [URL], to dir: String) {
         guard !urls.isEmpty else { return }
-        // Phone storage ignores letter case, so "Photo.JPG" would overwrite "photo.jpg".
-        let existing: Set<String> = dir == model.path ? Set(model.files.map { $0.name.lowercased() }) : []
-        let conflicts = Set(urls.map(\.lastPathComponent).filter { existing.contains($0.lowercased()) })
+        if dir == model.path {
+            confirmUpload(urls, to: dir, existing: model.files)
+        } else {
+            // Dropped onto a folder: look inside it first, so nothing in there is replaced without asking.
+            Task {
+                let existing = (try? await model.list(dir)) ?? []
+                confirmUpload(urls, to: dir, existing: existing)
+            }
+        }
+    }
+
+    private func confirmUpload(_ urls: [URL], to dir: String, existing: [RemoteFile]) {
+        let conflicts = FileBrowserModel.uploadConflicts(urls, existing: existing)
         if conflicts.isEmpty {
             transfers.push(urls, serial: device.serial, to: dir)
         } else {
@@ -519,7 +529,8 @@ struct FileBrowserView: View {
 
     private func takeScreenshot() {
         busyMessage = "Taking screenshot…"
-        let name = dm.displayName(for: device)
+        // Wi-Fi phones without a model name are called "192.168.1.5:5555"; keep the file name Finder-safe.
+        let name = dm.displayName(for: device).replacingOccurrences(of: "[/:]", with: "-", options: .regularExpression)
         run {
             defer { busyMessage = nil }
             let data = try await ADB.screenshot(serial: device.serial)

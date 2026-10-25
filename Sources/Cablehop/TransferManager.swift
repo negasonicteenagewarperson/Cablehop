@@ -19,7 +19,8 @@ final class Transfer: Identifiable {
     let direction: TransferDirection
     let name: String
     let source: String
-    let destination: String
+    /// For downloads, may change to "Name 2" if something else took the name before the copy finished.
+    private(set) var destination: String
     let isDirectory: Bool
     var state: TransferState = .queued
     var progress: Double = 0
@@ -45,6 +46,8 @@ final class Transfer: Identifiable {
     var isExactPath = false
     /// A drag into Finder: Finder drives the copy, so it can't be retried from here.
     var isExternal = false
+
+    fileprivate func moveDestination(to path: String) { destination = path }
 
     /// Updates progress at most every half percent, so a fast copy doesn't redraw the UI hundreds of
     /// times a second.
@@ -189,7 +192,7 @@ final class TransferManager {
         startedTick += 1
         try? FileManager.default.createDirectory(at: localDir, withIntermediateDirectories: true)
         for file in files {
-            let dest = uniqueDestination(in: localDir, name: file.name)
+            let dest = Self.uniqueDestination(in: localDir, name: file.name, reserved: reservedPaths)
             reservedPaths.insert(dest.path)
             let transfer = Transfer(serial: serial, direction: .pull, name: file.name, source: file.path,
                                     destination: dest.path, isDirectory: file.isDirectory,
@@ -248,8 +251,16 @@ final class TransferManager {
         for transfer in items where transfer.state.isActive { cancel(transfer) }
     }
 
+    /// Quitting: the copies won't get to tidy up after themselves, so remove half-finished downloads here.
+    func cancelAllBeforeQuit() {
+        let downloads = items.filter { $0.state == .running && $0.direction == .pull && !$0.isExternal }
+        cancelAll()
+        for transfer in downloads { try? FileManager.default.removeItem(atPath: transfer.partialPath) }
+    }
+
     func retry(_ transfer: Transfer) {
         guard !transfer.state.isActive else { return }
+        if transfer.direction == .pull && !transfer.isExactPath { reservedPaths.insert(transfer.destination) }
         transfer.state = .queued
         transfer.progress = 0
         transfer.detail = ""
@@ -260,13 +271,14 @@ final class TransferManager {
         items.removeAll { !$0.state.isActive }
     }
 
-    private func uniqueDestination(in dir: URL, name: String) -> URL {
+    /// "Photo.jpg", or "Photo 2.jpg", "Photo 3.jpg", … if that's already on the Mac or about to be.
+    nonisolated static func uniqueDestination(in dir: URL, name: String, reserved: Set<String>) -> URL {
         let fm = FileManager.default
         var candidate = dir.appendingPathComponent(name)
         let base = (name as NSString).deletingPathExtension
         let ext = (name as NSString).pathExtension
         var n = 2
-        while fm.fileExists(atPath: candidate.path) || reservedPaths.contains(candidate.path) {
+        while fm.fileExists(atPath: candidate.path) || reserved.contains(candidate.path) {
             candidate = dir.appendingPathComponent(ext.isEmpty ? "\(base) \(n)" : "\(base) \(n).\(ext)")
             n += 1
         }
@@ -407,7 +419,14 @@ final class TransferManager {
         if succeeded && transfer.direction == .pull && transfer.state != .cancelled {
             // Swap the finished download into place only now, so a failed copy never damages an existing file.
             do {
-                let dest = URL(fileURLWithPath: transfer.destination)
+                var dest = URL(fileURLWithPath: transfer.destination)
+                if !transfer.isExactPath && fm.fileExists(atPath: dest.path) {
+                    // Plain downloads never overwrite: something took the name while this one was copying
+                    // (e.g. a retry). Only sync, which names exact paths, updates files in place.
+                    dest = Self.uniqueDestination(in: dest.deletingLastPathComponent(), name: dest.lastPathComponent,
+                                                  reserved: reservedPaths)
+                    transfer.moveDestination(to: dest.path)
+                }
                 if fm.fileExists(atPath: dest.path) {
                     _ = try fm.replaceItemAt(dest, withItemAt: URL(fileURLWithPath: partial))
                 } else {

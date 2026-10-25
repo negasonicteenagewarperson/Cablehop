@@ -72,12 +72,7 @@ final class FileBrowserModel {
         isLoading = true
         loadTask = Task {
             do {
-                let list: [RemoteFile]
-                if let fs = Phones.mtp(serial) {
-                    list = try await onBackground { try fs.list(target) }
-                } else {
-                    list = try await ADB.listDirectory(serial: serial, path: target)
-                }
+                let list = try await list(target)
                 guard !Task.isCancelled, target == path else { return }
                 files = list
                 error = nil
@@ -90,6 +85,21 @@ final class FileBrowserModel {
             isLoading = false
             hasLoaded = true
         }
+    }
+
+    /// The contents of any phone folder, without navigating to it.
+    func list(_ dir: String) async throws -> [RemoteFile] {
+        if let fs = Phones.mtp(serial) {
+            return try await onBackground { try fs.list(dir) }
+        }
+        return try await ADB.listDirectory(serial: serial, path: dir)
+    }
+
+    /// Names of the files being uploaded that already exist in the destination folder. Phone storage
+    /// ignores letter case, so "Photo.JPG" counts as a match for "photo.jpg".
+    nonisolated static func uploadConflicts(_ urls: [URL], existing: [RemoteFile]) -> Set<String> {
+        let taken = Set(existing.map { $0.name.lowercased() })
+        return Set(urls.map(\.lastPathComponent).filter { taken.contains($0.lowercased()) })
     }
 
     // MARK: Phone-wide search

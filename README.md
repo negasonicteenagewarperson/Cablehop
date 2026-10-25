@@ -7,7 +7,8 @@
 **Move files between your Mac and your Android phone. Just plug it in.**
 
 A native Mac app that lets you browse your phone like a Finder window and drag files both ways,
-over a USB cable or Wi-Fi. Nothing to install on the phone.
+over a USB cable or Wi-Fi. Nothing to install on the phone. A free, open-source alternative to
+Google's Android File Transfer, MacDroid and OpenMTP.
 
 [![Download](https://img.shields.io/github/v/release/negasonicteenagewarperson/Cablehop?label=Download&color=34c759)](https://github.com/negasonicteenagewarperson/Cablehop/releases/latest)
 ![macOS 14+](https://img.shields.io/badge/macOS-14%20Sonoma%20or%20later-blue)

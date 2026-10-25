@@ -77,7 +77,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         alert.addButton(withTitle: "Quit Anyway")
         alert.buttons[1].hasDestructiveAction = true
         guard alert.runModal() == .alertSecondButtonReturn else { return .terminateCancel }
-        transfers.cancelAll()
+        transfers.cancelAllBeforeQuit()
         return .terminateNow
     }
 }

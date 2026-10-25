@@ -155,6 +155,28 @@ struct LocalFileTests {
     }
 }
 
+@Suite("Never overwrite by surprise")
+struct OverwriteTests {
+    /// Regression test: dropping onto a folder row must find same-named files in that folder, ignoring case.
+    @Test func uploadConflictsIgnoreCase() {
+        let existing = [RemoteFile(path: "/sdcard/DCIM/photo.jpg", name: "photo.jpg", isDirectory: false, size: 1, modified: .now),
+                        RemoteFile(path: "/sdcard/DCIM/Trip", name: "Trip", isDirectory: true, size: 0, modified: .now)]
+        let urls = ["/tmp/Photo.JPG", "/tmp/trip", "/tmp/new.png"].map { URL(fileURLWithPath: $0) }
+        #expect(FileBrowserModel.uploadConflicts(urls, existing: existing) == ["Photo.JPG", "trip"])
+        #expect(FileBrowserModel.uploadConflicts(urls, existing: []).isEmpty)
+    }
+
+    @Test func downloadsPickAFreeName() throws {
+        let tmp = FileManager.default.temporaryDirectory.appendingPathComponent("ddtest-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: tmp) }
+        try FileManager.default.createDirectory(at: tmp, withIntermediateDirectories: true)
+        try Data(count: 1).write(to: tmp.appendingPathComponent("IMG.jpg"))
+        let reserved: Set = [tmp.appendingPathComponent("IMG 2.jpg").path]
+        #expect(TransferManager.uniqueDestination(in: tmp, name: "IMG.jpg", reserved: reserved).lastPathComponent == "IMG 3.jpg")
+        #expect(TransferManager.uniqueDestination(in: tmp, name: "Notes", reserved: []).lastPathComponent == "Notes")
+    }
+}
+
 @Suite("adb process control")
 struct ProcessTests {
     @Test func timeoutKillsStuckCommand() async throws {
@@ -303,6 +325,24 @@ struct UpdaterTests {
         #expect(try v("2.0.1") > v("2.0"))
         #expect(AppVersion("latest") == nil)
         #expect(AppVersion("") == nil)
+    }
+
+    /// The updater opens the downloaded disk image this way, so it has to work on the running macOS.
+    @Test func mountsAndEjectsADiskImage() async throws {
+        let tmp = FileManager.default.temporaryDirectory.appendingPathComponent("ddtest-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: tmp) }
+        let content = tmp.appendingPathComponent("content")
+        try FileManager.default.createDirectory(at: content, withIntermediateDirectories: true)
+        try Data("hello".utf8).write(to: content.appendingPathComponent("marker.txt"))
+        let dmg = tmp.appendingPathComponent("test.dmg")
+        try await Updater.run("/usr/bin/hdiutil", ["create", "-quiet", "-volname", "CablehopTest", "-srcfolder", content.path,
+                                                   "-format", "UDZO", dmg.path])
+        let mount = tmp.appendingPathComponent("mount")
+        try FileManager.default.createDirectory(at: mount, withIntermediateDirectories: true)
+        try await Updater.attach(dmg, at: mount)
+        #expect(FileManager.default.fileExists(atPath: mount.appendingPathComponent("marker.txt").path))
+        await Updater.detach(mount)
+        #expect(!FileManager.default.fileExists(atPath: mount.appendingPathComponent("marker.txt").path))
     }
 
     @Test func findsTheRightChecksum() throws {

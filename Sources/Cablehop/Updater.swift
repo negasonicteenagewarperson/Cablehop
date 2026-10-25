@@ -85,7 +85,7 @@ final class Updater {
     static let shared = Updater()
 
     /// Public half of the release signing key (see Scripts/sign-release.swift).
-    static let releasePublicKey = "PUGLgiwkERfBPuSdEz7potOxIOm46p9E8McTE5Xi2Lk="
+    nonisolated static let releasePublicKey = "PUGLgiwkERfBPuSdEz7potOxIOm46p9E8McTE5Xi2Lk="
 
     enum Phase: Equatable {
         case idle
@@ -231,12 +231,12 @@ final class Updater {
             // 2. Open the disk image and check the app inside.
             let mount = work.appendingPathComponent("mount", isDirectory: true)
             try FileManager.default.createDirectory(at: mount, withIntermediateDirectories: true)
-            try await Self.run("/usr/bin/hdiutil", ["attach", "-nobrowse", "-readonly", "-noautoopen", "-mountpoint", mount.path, dmg.path])
+            try await Self.attach(dmg, at: mount)
             var mounted = true
             func unmount() async {
                 guard mounted else { return }
                 mounted = false
-                _ = try? await Self.run("/usr/bin/hdiutil", ["detach", "-force", mount.path])
+                await Self.detach(mount)
             }
             let newApp = mount.appendingPathComponent("Cablehop.app")
             let current = Bundle.main.bundleURL
@@ -362,6 +362,23 @@ final class Updater {
         guard app.pathExtension == "app", !path.contains("/AppTranslocation/"), !path.hasPrefix("/Volumes/") else { return false }
         return FileManager.default.isWritableFile(atPath: app.deletingLastPathComponent().path)
             && FileManager.default.isWritableFile(atPath: path)
+    }
+
+    /// Mounts a disk image read-only and hidden from Finder. Newer macOS replaces `hdiutil attach` with
+    /// `diskutil image attach`; older versions don't have that, so fall back to hdiutil.
+    nonisolated static func attach(_ dmg: URL, at mount: URL) async throws {
+        do {
+            try await run("/usr/sbin/diskutil", ["image", "attach", "--mountOptions", "nobrowse", "--readOnly",
+                                                 "--mountPoint", mount.path, dmg.path])
+        } catch {
+            try await run("/usr/bin/hdiutil", ["attach", "-nobrowse", "-readonly", "-noautoopen", "-mountpoint", mount.path, dmg.path])
+        }
+    }
+
+    nonisolated static func detach(_ mount: URL) async {
+        if (try? await run("/usr/sbin/diskutil", ["eject", mount.path])) == nil {
+            _ = try? await run("/usr/bin/hdiutil", ["detach", "-force", mount.path])
+        }
     }
 
     @discardableResult
