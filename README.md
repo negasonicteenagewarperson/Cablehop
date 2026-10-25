@@ -40,9 +40,11 @@ over a USB cable or Wi-Fi. Nothing to install on the phone.
 ## What is Cablehop?
 
 Macs don't come with a way to open an Android phone the way they open an iPhone or a USB drive.
-Google's old *Android File Transfer* app is discontinued, and the alternatives are often paid or clunky.
+Google's old *Android File Transfer* app is discontinued, and the alternatives I tried were slow,
+overpriced, finicky and just not very good. So I built Cablehop, mainly to use myself. It works well
+enough now that anyone can use it, free.
 
-Cablehop fills that gap. Connect your phone and it shows up in the sidebar. Browse its folders,
+Connect your phone and it shows up in the sidebar. Browse its folders,
 see your photos as thumbnails, and drag files between it and Finder. It looks and behaves like a
 Mac app: Apple's Liquid Glass design on macOS 26 and later, Finder-style lists, Quick Look, the usual
 keyboard shortcuts, Light and Dark Mode. It keeps itself up to date, and if something goes wrong,
