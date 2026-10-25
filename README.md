@@ -19,7 +19,7 @@ Google's Android File Transfer, MacDroid and OpenMTP.
 
 <br>
 
-<img src="docs/screenshots/camera.webp" width="900" alt="Cablehop showing the Camera folder of a Pixel 10 Pro XL connected in File transfer mode">
+<img src="docs/screenshots/camera.png" width="900" alt="Cablehop showing the Camera folder of a Pixel 10 Pro XL connected in File transfer mode">
 
 </div>
 
@@ -70,20 +70,20 @@ You can start with file transfer and switch on the extras later. Cablehop notice
 
 <table>
   <tr>
-    <td width="50%"><img src="docs/screenshots/camera.webp" alt="The Camera folder on the phone, listed like a Finder window"></td>
-    <td width="50%"><img src="docs/screenshots/internal-storage.png" alt="The phone's Internal Storage, with folders and files"></td>
-  </tr>
-  <tr>
-    <td><b>Your photos, Finder-style.</b> Sort by name, size or date and drag files straight into Finder.</td>
-    <td><b>The whole phone.</b> Every folder in Internal Storage, with sizes and dates.</td>
-  </tr>
-  <tr>
     <td width="50%"><img src="docs/screenshots/welcome.webp" alt="The welcome screen with steps to connect a phone"></td>
     <td width="50%"><img src="docs/screenshots/phone-root.webp" alt="The phone's root, showing its storage areas"></td>
   </tr>
   <tr>
     <td><b>Just plug it in.</b> The welcome screen shows how to connect, and how to unlock the extra features.</td>
     <td><b>Phone Root.</b> Every storage area on the phone, including SD cards.</td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/internal-storage.png" alt="The phone's Internal Storage, with folders and files"></td>
+    <td width="50%"><img src="docs/screenshots/camera.png" alt="The Camera folder on the phone, listed like a Finder window"></td>
+  </tr>
+  <tr>
+    <td><b>The whole phone.</b> Every folder in Internal Storage, with sizes and dates.</td>
+    <td><b>Your photos, Finder-style.</b> Sort by name, size or date and drag files straight into Finder.</td>
   </tr>
 </table>
 
