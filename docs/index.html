@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cablehop: Android File Transfer for Mac (free, open source)</title>
+<meta name="description" content="Cablehop is a free, open-source Mac app to transfer files between your Mac and an Android phone over USB or Wi-Fi. Browse your phone like Finder, drag and drop, no setup on the phone. Works on Apple silicon and Intel.">
+<link rel="canonical" href="https://negasonicteenagewarperson.github.io/Cablehop/">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#0f1720">
+<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Cablehop">
+<meta property="og:title" content="Cablehop: Android File Transfer for Mac">
+<meta property="og:description" content="Free, open-source Mac app to move files between your Mac and an Android phone over USB or Wi-Fi. Finder-style, no setup on the phone.">
+<meta property="og:url" content="https://negasonicteenagewarperson.github.io/Cablehop/">
+<meta property="og:image" content="https://negasonicteenagewarperson.github.io/Cablehop/img/social-preview.jpg">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Cablehop: Android File Transfer for Mac">
+<meta name="twitter:description" content="Free, open-source Mac app to move files between your Mac and an Android phone over USB or Wi-Fi.">
+<meta name="twitter:image" content="https://negasonicteenagewarperson.github.io/Cablehop/img/social-preview.jpg">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "name": "Cablehop",
+      "alternateName": "Cablehop for Mac",
+      "description": "Free, open-source Mac app to transfer files between a Mac and an Android phone over USB (File transfer mode) or Wi-Fi. A Finder-style alternative to Android File Transfer, MacDroid and OpenMTP.",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "macOS 14 Sonoma or later",
+      "url": "https://negasonicteenagewarperson.github.io/Cablehop/",
+      "downloadUrl": "https://github.com/negasonicteenagewarperson/Cablehop/releases/latest",
+      "installUrl": "https://github.com/negasonicteenagewarperson/Cablehop/releases/latest",
+      "softwareVersion": "2.4",
+      "license": "https://opensource.org/licenses/MIT",
+      "isAccessibleForFree": true,
+      "image": "https://negasonicteenagewarperson.github.io/Cablehop/img/social-preview.jpg",
+      "screenshot": [
+        "https://negasonicteenagewarperson.github.io/Cablehop/img/camera.jpg",
+        "https://negasonicteenagewarperson.github.io/Cablehop/img/internal-storage.jpg"
+      ],
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "author": { "@type": "Person", "name": "AK", "url": "https://github.com/negasonicteenagewarperson" },
+      "codeRepository": "https://github.com/negasonicteenagewarperson/Cablehop"
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How do I transfer files from an Android phone to a Mac?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Install Cablehop, plug your Android phone into your Mac with a USB cable, unlock it, and choose File transfer in the USB notification. The phone appears in Cablehop's sidebar. Browse its folders and drag files between it and Finder." }
+        },
+        {
+          "@type": "Question",
+          "name": "Is Cablehop a replacement for Android File Transfer?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Google's Android File Transfer app is discontinued. Cablehop does the same job with a Finder-style window, drag and drop both ways, photo thumbnails, Quick Look, Wi-Fi connections and a transfers list, and it is free and open source." }
+        },
+        {
+          "@type": "Question",
+          "name": "Do I need to install anything on my Android phone?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. File transfer mode uses the standard USB File transfer option every Android phone has. USB debugging is optional and only adds extras such as phone-wide search, folder sync, screenshots and Wi-Fi." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does Cablehop work on Apple silicon (M1, M2, M3, M4) and Intel Macs?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. It is a universal app for Apple silicon and Intel Macs and needs macOS 14 Sonoma or later. On macOS 26 and later it uses Apple's Liquid Glass design." }
+        },
+        {
+          "@type": "Question",
+          "name": "Which Android phones does it work with?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Any Android phone that offers File transfer (MTP) over USB, including Google Pixel, Samsung, Xiaomi, OnePlus, Motorola, Sony, Nothing, Oppo and Vivo." }
+        },
+        {
+          "@type": "Question",
+          "name": "Is Cablehop free and safe?",
+          "acceptedAnswer": { "@type": "Answer", "text": "It is free and MIT-licensed, and the source code is public on GitHub. It has no accounts, ads or tracking, logs stay on your Mac, and updates are signed and checked before they install." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<style>
+  :root {
+    --bg: #f6f8fa; --card: #ffffff; --text: #14181d; --muted: #5b6672; --line: #dfe4ea;
+    --accent: #1f9d5c; --accent-text: #ffffff; --shadow: 0 10px 40px rgba(20, 30, 40, .12);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1720; --card: #16212c; --text: #eef2f6; --muted: #9aa8b6; --line: #25323f;
+      --accent: #3ddc84; --accent-text: #062014; --shadow: 0 10px 40px rgba(0, 0, 0, .45);
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--text); line-height: 1.6;
+         font: 17px/1.6 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif; }
+  a { color: var(--accent); }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+  header.top { display: flex; align-items: center; justify-content: space-between; padding: 18px 0; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 20px; color: var(--text); text-decoration: none; }
+  .brand img { width: 36px; height: 36px; }
+  nav a { margin-left: 18px; color: var(--muted); text-decoration: none; font-size: 15px; }
+  nav a:hover { color: var(--text); }
+  .hero { text-align: center; padding: 56px 0 32px; }
+  .hero img.icon { width: 112px; height: 112px; border-radius: 26px; box-shadow: var(--shadow); }
+  h1 { font-size: clamp(34px, 6vw, 56px); line-height: 1.1; margin: 24px 0 12px; letter-spacing: -0.02em; }
+  .lead { font-size: clamp(18px, 2.4vw, 22px); color: var(--muted); max-width: 680px; margin: 0 auto 28px; }
+  .btn { display: inline-block; background: var(--accent); color: var(--accent-text); font-weight: 700; text-decoration: none;
+         padding: 14px 28px; border-radius: 999px; font-size: 18px; box-shadow: var(--shadow); }
+  .btn:hover { filter: brightness(1.06); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); box-shadow: none; margin-left: 10px; }
+  .meta { color: var(--muted); font-size: 14px; margin-top: 16px; }
+  .shot { margin: 40px auto 0; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid var(--line); }
+  .shot img { display: block; width: 100%; height: auto; }
+  section { padding: 56px 0 8px; }
+  h2 { font-size: clamp(26px, 4vw, 36px); margin: 0 0 8px; letter-spacing: -0.01em; }
+  .sub { color: var(--muted); margin: 0 0 28px; }
+  .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; }
+  .card h3 { margin: 0 0 6px; font-size: 18px; }
+  .card p { margin: 0; color: var(--muted); font-size: 16px; }
+  figure { margin: 0; background: var(--card); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  figure img { display: block; width: 100%; height: auto; }
+  figcaption { padding: 14px 18px; color: var(--muted); font-size: 15px; }
+  figcaption b { color: var(--text); }
+  ol.steps { padding-left: 22px; } ol.steps li { margin: 8px 0; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 18px; margin: 10px 0; }
+  summary { cursor: pointer; font-weight: 600; }
+  details p { color: var(--muted); margin: 10px 0 0; }
+  table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--line); font-size: 16px; }
+  tr:last-child td { border-bottom: none; } th { color: var(--muted); font-weight: 600; width: 34%; }
+  footer { padding: 56px 0 48px; color: var(--muted); font-size: 15px; text-align: center; }
+  footer a { color: var(--muted); }
+  code { background: var(--card); border: 1px solid var(--line); padding: 2px 7px; border-radius: 6px; font-size: .92em; }
+  @media (max-width: 560px) { nav a:not(.keep) { display: none; } .btn.ghost { margin: 12px 0 0; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="./"><img src="img/icon-512.png" alt="" width="36" height="36">Cablehop</a>
+    <nav>
+      <a href="#features">Features</a>
+      <a href="#install">Install</a>
+      <a href="#faq">FAQ</a>
+      <a class="keep" href="https://github.com/negasonicteenagewarperson/Cablehop">GitHub</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="hero">
+      <img class="icon" src="img/icon-512.png" alt="Cablehop app icon" width="112" height="112">
+      <h1>Android File Transfer for Mac</h1>
+      <p class="lead">Cablehop moves files between your Mac and your Android phone over a USB cable or Wi-Fi. Browse your phone like a Finder window and drag files both ways. Nothing to install on the phone. Free and open source.</p>
+      <a class="btn" href="https://github.com/negasonicteenagewarperson/Cablehop/releases/latest">Download for Mac</a>
+      <a class="btn ghost" href="https://github.com/negasonicteenagewarperson/Cablehop">View on GitHub</a>
+      <p class="meta">Version 2.4 · macOS 14 Sonoma or later · Apple silicon and Intel · MIT licence</p>
+      <div class="shot"><img src="img/camera.jpg" width="1400" height="849" alt="Cablehop showing the Camera folder of an Android phone as a Finder-style list on a Mac"></div>
+    </div>
+
+    <section id="why">
+      <h2>Why Cablehop?</h2>
+      <p class="sub">Macs can't open an Android phone the way they open an iPhone or a USB drive. Google's own Android File Transfer app is discontinued, and the alternatives I tried were slow, overpriced, finicky and just not very good. So I built Cablehop, mainly for myself. It works well enough now that anyone can use it, free.</p>
+    </section>
+
+    <section id="features">
+      <h2>What it does</h2>
+      <p class="sub">A native Mac app: Finder-style lists, Quick Look, the usual shortcuts, Light and Dark Mode, and Apple's Liquid Glass design on macOS 26 and later.</p>
+      <div class="grid">
+        <div class="card"><h3>Browse like Finder</h3><p>See every folder on your phone in a sortable list or a photo grid with thumbnails. Press Space for Quick Look.</p></div>
+        <div class="card"><h3>Drag and drop both ways</h3><p>Drag files from the phone into Finder, or from Finder onto the phone. Drop on a folder to send files straight into it.</p></div>
+        <div class="card"><h3>No setup on the phone</h3><p>Uses the standard USB <b>File transfer</b> option every Android phone has. No app, no driver, no root.</p></div>
+        <div class="card"><h3>USB or Wi-Fi</h3><p>Plug in a cable, or connect wirelessly with a QR code, a pairing code or an IP address (optional USB debugging).</p></div>
+        <div class="card"><h3>Big transfers, handled</h3><p>A transfers button shows progress, speed and time left. Cancel, retry and see your history. Large files work.</p></div>
+        <div class="card"><h3>Extras with USB debugging</h3><p>Search the whole phone, keep folders in sync, copy and move on the phone itself, take screenshots and install apps.</p></div>
+        <div class="card"><h3>Safe by design</h3><p>Asks before replacing files, never overwrites on your Mac, protects important phone folders, and checks downloads.</p></div>
+        <div class="card"><h3>Updates itself</h3><p>Check for Updates installs new versions that are signed and verified. Logs stay on your Mac, with Save Logs for bug reports.</p></div>
+      </div>
+    </section>
+
+    <section id="screenshots">
+      <h2>Screenshots</h2>
+      <p class="sub">Cablehop 2.4 on macOS 26, with a Google Pixel connected over USB.</p>
+      <div class="grid">
+        <figure><img loading="lazy" src="img/welcome.jpg" width="1400" height="854" alt="Cablehop welcome screen with steps to connect an Android phone"><figcaption><b>Just plug it in.</b> The welcome screen shows how to connect, and how to unlock the extra features.</figcaption></figure>
+        <figure><img loading="lazy" src="img/phone-root.jpg" width="1400" height="848" alt="Cablehop showing the root of an Android phone's storage"><figcaption><b>Phone Root.</b> Every storage area on the phone, including SD cards.</figcaption></figure>
+        <figure><img loading="lazy" src="img/internal-storage.jpg" width="1400" height="854" alt="Cablehop listing the folders and files in an Android phone's Internal Storage"><figcaption><b>The whole phone.</b> Every folder in Internal Storage, with sizes and dates.</figcaption></figure>
+        <figure><img loading="lazy" src="img/camera.jpg" width="1400" height="849" alt="Cablehop showing photos in the Camera folder of an Android phone"><figcaption><b>Your photos, Finder-style.</b> Sort by name, size or date and drag files straight into Finder.</figcaption></figure>
+      </div>
+    </section>
+
+    <section id="install">
+      <h2>Install in a minute</h2>
+      <p class="sub">Works on any Apple silicon (M1 and later) or Intel Mac with macOS 14 or later, and any Android phone.</p>
+      <ol class="steps">
+        <li><a href="https://github.com/negasonicteenagewarperson/Cablehop/releases/latest">Download <b>Cablehop.dmg</b></a>, open it and drag <b>Cablehop</b> onto <b>Applications</b>.</li>
+        <li>Open Cablehop. The first time, macOS says it can't verify the app because it isn't notarized by Apple: click <b>Done</b>, then go to <b>System Settings › Privacy &amp; Security</b> and click <b>Open Anyway</b>. You only do this once.</li>
+        <li>Plug your phone in with a USB cable, unlock it, pull down the notifications, tap the USB notification and choose <b>File transfer</b>.</li>
+        <li>Your phone appears in the sidebar. Browse, and drag files in or out.</li>
+      </ol>
+      <p class="sub">For the optional extras (search, sync, screenshots, Wi-Fi), turn on USB debugging and install Google's free <a href="https://developer.android.com/tools/releases/platform-tools">platform tools</a>. The <a href="https://github.com/negasonicteenagewarperson/Cablehop#unlocking-every-feature-usb-debugging">README</a> has the steps.</p>
+    </section>
+
+    <section id="compare">
+      <h2>Cablehop compared</h2>
+      <table>
+        <tr><th>Google Android File Transfer</th><td>Discontinued by Google. USB only.</td></tr>
+        <tr><th>MacDroid</th><td>Has a free tier; the full feature set needs a paid plan.</td></tr>
+        <tr><th>OpenMTP</th><td>Free and open source, built with web technology rather than as a native Mac app.</td></tr>
+        <tr><th><b>Cablehop</b></th><td>Free and open source, native Mac app, USB and Wi-Fi, photo thumbnails, Quick Look, folder sync, signed auto-updates.</td></tr>
+      </table>
+      <p class="sub" style="margin-top:12px;font-size:14px">Product names belong to their owners. Summary written from public information; features and prices may change.</p>
+    </section>
+
+    <section id="faq">
+      <h2>Questions</h2>
+      <details><summary>How do I transfer files from an Android phone to a Mac?</summary><p>Install Cablehop, plug your phone in, unlock it and choose <b>File transfer</b> in the USB notification. The phone appears in Cablehop's sidebar. Browse its folders and drag files between it and Finder.</p></details>
+      <details><summary>Is Cablehop a replacement for Android File Transfer?</summary><p>Yes. Google's Android File Transfer is discontinued. Cablehop does the same job and more: a Finder-style window, drag and drop both ways, photo thumbnails, Quick Look, Wi-Fi, a transfers list and signed updates.</p></details>
+      <details><summary>Do I need to install anything on my phone?</summary><p>No. File transfer mode uses the standard USB option every Android phone has. USB debugging is optional and only adds extras.</p></details>
+      <details><summary>Does it work on Apple silicon (M1, M2, M3, M4) and Intel Macs?</summary><p>Yes. It's a universal app and needs macOS 14 Sonoma or later. On macOS 26 and later it uses Apple's Liquid Glass design.</p></details>
+      <details><summary>Which Android phones work?</summary><p>Any phone with File transfer (MTP) over USB: Google Pixel, Samsung, Xiaomi, OnePlus, Motorola, Sony, Nothing, Oppo, Vivo and others.</p></details>
+      <details><summary>Why does macOS warn me the first time I open it?</summary><p>The app isn't notarized by Apple, which needs a paid developer account. Click Done, then open System Settings › Privacy &amp; Security and click Open Anyway. You only do this once.</p></details>
+      <details><summary>Is it free and safe?</summary><p>It's free and MIT-licensed, and the source code is public on <a href="https://github.com/negasonicteenagewarperson/Cablehop">GitHub</a>. No accounts, ads or tracking. Logs stay on your Mac, and updates are signed and checked before they install.</p></details>
+      <details><summary>Something isn't working. What do I do?</summary><p>Choose <b>Help › Report a Problem</b> in the app. It helps you save your logs, then opens <a href="https://github.com/negasonicteenagewarperson/Cablehop/issues/new/choose">GitHub Issues</a>.</p></details>
+    </section>
+  </main>
+
+  <footer>
+    <p>Cablehop is free software by <a href="https://github.com/negasonicteenagewarperson">AK</a>, released under the MIT licence.<br>
+    <a href="https://github.com/negasonicteenagewarperson/Cablehop/releases">Release notes</a> ·
+    <a href="https://github.com/negasonicteenagewarperson/Cablehop/issues">Issues</a> ·
+    <a href="https://github.com/negasonicteenagewarperson/Cablehop#readme">Full documentation</a></p>
+  </footer>
+</div>
+</body>
+</html>

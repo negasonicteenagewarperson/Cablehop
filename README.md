@@ -15,7 +15,7 @@ Google's Android File Transfer, MacDroid and OpenMTP.
 ![Apple silicon and Intel](https://img.shields.io/badge/Apple%20silicon%20%2B%20Intel-universal-lightgrey)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-**[⬇︎ Download the latest Cablehop (.dmg)](https://github.com/negasonicteenagewarperson/Cablehop/releases/latest)**
+**[⬇︎ Download the latest Cablehop (.dmg)](https://github.com/negasonicteenagewarperson/Cablehop/releases/latest)** · [Website](https://negasonicteenagewarperson.github.io/Cablehop/)
 
 <br>
 
